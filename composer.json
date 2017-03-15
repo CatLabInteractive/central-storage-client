@@ -1,0 +1,32 @@
+{
+  "name": "catlabinteractive/central-storage-client",
+  "description": "Client for CatLab central storage.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thijs Van der Schaeghe",
+      "email": "thijs@catlab.be"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "CatLab\\CentralStorage\\Client\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": ">=6.0",
+    "php": "^7.0",
+    "symfony/psr-http-message-bridge": "^1.0",
+    "zendframework/zend-diactoros": "^1.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "laravel/framework": "5.4.*"
+  }
+}

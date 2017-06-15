@@ -3,6 +3,7 @@
 namespace CatLab\CentralStorage\Client;
 
 use CatLab\CentralStorage\Client\Exceptions\StorageServerException;
+use CatLab\CentralStorage\Client\Interfaces\CentralStorageClient as CentralStorageClientInterface;
 use CatLab\CentralStorage\Client\Models\Asset;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\File;
  * Class CentralStorageClient
  * @package CatLab\CentralStorage\Client
  */
-class CentralStorageClient implements CatLab\CentralStorage\Client\Interfaces\CentralStorageClient
+class CentralStorageClient implements CentralStorageClientInterface
 {
     const QUERY_NONCE = 'nonce';
 

@@ -18,7 +18,8 @@ class StorageServerException extends CentralStorageException
     {
         $ex = new self('Central Storage Server Exception: ' . $e->getMessage());
         if ($e->hasResponse()) {
-            $ex->response = $e->getResponse();
+            $ex->response = $e->getResponse()->getBody();
+            $ex->responseHeaders = $e->getResponse()->getHeaders();
         }
 
         return $ex;
@@ -42,10 +43,23 @@ class StorageServerException extends CentralStorageException
     protected $response;
 
     /**
+     * @var string[][]
+     */
+    protected $responseHeaders;
+
+    /**
      * @return string
      */
     public function getResponse()
     {
         return $this->response;
+    }
+
+    /**
+     * @return \string[][]
+     */
+    public function getResponseHeaders()
+    {
+        return $this->responseHeaders;
     }
 }

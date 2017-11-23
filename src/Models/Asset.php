@@ -198,6 +198,7 @@ class Asset extends Model
      */
     public function isVideo()
     {
+        /*
         switch ($this->mimetype) {
             case 'video/mp4':
             case 'video/mpeg':
@@ -207,6 +208,10 @@ class Asset extends Model
             default:
                 return false;
         }
+        */
+
+        $parts = explode('/', $this->mimetype);
+        return strtolower($parts[0]) === 'video';
     }
 
     /**

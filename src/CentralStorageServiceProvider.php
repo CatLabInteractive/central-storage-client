@@ -16,7 +16,7 @@ class CentralStorageServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(
-            \CatLab\CentralStorage\Client\Interfaces\CentralStorageClient::class,
+            Interfaces\CentralStorageClient::class,
             function () {
                 return CentralStorageClient::fromConfig();
             }

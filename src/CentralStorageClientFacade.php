@@ -15,6 +15,6 @@ class CentralStorageClientFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return CatLab\CentralStorage\Client\Interfaces\CentralStorageClient::class;
+        return \CatLab\CentralStorage\Client\Interfaces\CentralStorageClient::class;
     }
 }

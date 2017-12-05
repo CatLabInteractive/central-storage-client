@@ -98,7 +98,7 @@ class CentralStorageClient implements CentralStorageClientInterface
         // Add a nonce that we won't check but we add it anyway.
         $request->query->set(self::QUERY_NONCE, $this->getNonce());
 
-        $signature = $this->getSignature($request, $this->algorithm);
+        $signature = $this->getSignature($request, $this->algorithm, $secret);
 
         $request->headers->set(self::HEADER_SIGNATURE, $signature);
         $request->headers->set(self::HEADER_KEY, $key);
@@ -127,7 +127,7 @@ class CentralStorageClient implements CentralStorageClientInterface
         $salt = array_shift($signatureParts);
         $signature = array_shift($signatureParts);
 
-        $actualSignature = $this->getSignature($request, $algorithm, $salt);
+        $actualSignature = $this->getSignature($request, $algorithm, $secret, $salt);
         if (!$actualSignature) {
             return false;
         }
@@ -190,10 +190,11 @@ class CentralStorageClient implements CentralStorageClientInterface
     /**
      * @param Request $request
      * @param $algorithm
+     * @param $secret
      * @param null $salt
      * @return string
      */
-    protected function getSignature(Request $request, $algorithm, $salt = null)
+    protected function getSignature(Request $request, $algorithm, $secret, $salt = null)
     {
         if (!$this->isValidAlgorithm($algorithm)) {
             return false;
@@ -207,6 +208,7 @@ class CentralStorageClient implements CentralStorageClientInterface
         }
 
         $inputs['salt'] = $salt;
+        $inputs['secret'] = $secret;
 
         // Sort on key
         ksort($inputs);

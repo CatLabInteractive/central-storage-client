@@ -378,7 +378,7 @@ class CentralStorageClient implements CentralStorageClientInterface
             $query = '?' . http_build_query($properties);
         }
 
-        $server = isset($server) ? $this->server : null;
+        $server = $server ?? $this->server;
         return $server . '/assets/' . $asset->getAssetKey() . $query;
     }
 

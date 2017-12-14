@@ -49,6 +49,11 @@ class CentralStorageClient implements CentralStorageClientInterface
     protected $consumerSecret;
 
     /**
+     * @var string
+     */
+    protected $version;
+
+    /**
      * @return CentralStorageClient
      */
     public static function fromConfig()
@@ -56,7 +61,8 @@ class CentralStorageClient implements CentralStorageClientInterface
         return new CentralStorageClient(
             \Config::get('centralStorage.server'),
             \Config::get('centralStorage.key'),
-            \Config::get('centralStorage.secret')
+            \Config::get('centralStorage.secret'),
+            \Config::get('centralStorage.version')
         );
     }
 
@@ -66,12 +72,14 @@ class CentralStorageClient implements CentralStorageClientInterface
      * @param null $consumerKey
      * @param null $consumerSecret
      * @param ClientInterface|null $httpClient
+     * @param string $version
      */
     public function __construct(
         $server = null,
         $consumerKey = null,
         $consumerSecret = null,
-        ClientInterface $httpClient = null
+        ClientInterface $httpClient = null,
+        $version = '1'
     ) {
         if (!isset($httpClient)) {
             $httpClient = new GuzzleClient();
@@ -81,6 +89,7 @@ class CentralStorageClient implements CentralStorageClientInterface
         $this->server = $server;
         $this->consumerKey = $consumerKey;
         $this->consumerSecret = $consumerSecret;
+        $this->version = $version;
     }
 
     /**
@@ -360,9 +369,7 @@ class CentralStorageClient implements CentralStorageClientInterface
      */
     public function getAssetUrl(Asset $asset, array $properties = [], $server = null)
     {
-        $query = '';
-
-        $version = config('centralStorage.version');
+        $version = $this->version;
         if (!empty($version)) {
             $properties['_v'] = $version;
         }
@@ -371,7 +378,7 @@ class CentralStorageClient implements CentralStorageClientInterface
             $query = '?' . http_build_query($properties);
         }
 
-        $server = $server ?? $this->server;
+        $server = isset($server) ? $this->server : null;
         return $server . '/assets/' . $asset->getAssetKey() . $query;
     }
 

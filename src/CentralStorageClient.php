@@ -369,6 +369,8 @@ class CentralStorageClient implements CentralStorageClientInterface
      */
     public function getAssetUrl(Asset $asset, array $properties = [], $server = null)
     {
+        $query = '';
+
         $version = $this->version;
         if (!empty($version)) {
             $properties['_v'] = $version;

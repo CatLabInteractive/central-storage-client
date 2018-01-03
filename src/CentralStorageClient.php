@@ -41,6 +41,11 @@ class CentralStorageClient implements CentralStorageClientInterface
     /**
      * @var string
      */
+    protected $front;
+
+    /**
+     * @var string
+     */
     protected $consumerKey;
 
     /**
@@ -58,12 +63,18 @@ class CentralStorageClient implements CentralStorageClientInterface
      */
     public static function fromConfig()
     {
-        return new CentralStorageClient(
+        $client = new CentralStorageClient(
             \Config::get('centralStorage.server'),
             \Config::get('centralStorage.key'),
             \Config::get('centralStorage.secret'),
             \Config::get('centralStorage.version')
         );
+
+        if (!empty(\Config::get('centralStorage.front'))) {
+            $client->setFrontUrl(\Config::get('centralStorage.front'));
+        }
+
+        return $client;
     }
 
     /**
@@ -90,6 +101,31 @@ class CentralStorageClient implements CentralStorageClientInterface
         $this->consumerKey = $consumerKey;
         $this->consumerSecret = $consumerSecret;
         $this->version = $version;
+        $this->front = null;
+    }
+
+    /**
+     * Optionally set the url that will be used to load assets (by end users)
+     * @param string $front
+     * @return $this
+     */
+    public function setFrontUrl(string $front)
+    {
+        $this->front = $front;
+        return $this;
+    }
+
+    /**
+     * Return the url that will be sent to end users.
+     * @return string
+     */
+    public function getFrontUrl()
+    {
+        if ($this->front !== null) {
+            return $this->front;
+        } else {
+            return $this->server;
+        }
     }
 
     /**
@@ -380,7 +416,7 @@ class CentralStorageClient implements CentralStorageClientInterface
             $query = '?' . http_build_query($properties);
         }
 
-        $server = $server ?? $this->server;
+        $server = $server ?? $this->getFrontUrl();
         return $server . '/assets/' . $asset->getAssetKey() . $query;
     }
 

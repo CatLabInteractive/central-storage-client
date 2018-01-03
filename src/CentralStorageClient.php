@@ -5,6 +5,7 @@ namespace CatLab\CentralStorage\Client;
 use CatLab\CentralStorage\Client\Exceptions\StorageServerException;
 use CatLab\CentralStorage\Client\Interfaces\CentralStorageClient as CentralStorageClientInterface;
 use CatLab\CentralStorage\Client\Models\Asset;
+use Config;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
@@ -64,14 +65,15 @@ class CentralStorageClient implements CentralStorageClientInterface
     public static function fromConfig()
     {
         $client = new CentralStorageClient(
-            \Config::get('centralStorage.server'),
-            \Config::get('centralStorage.key'),
-            \Config::get('centralStorage.secret'),
-            \Config::get('centralStorage.version')
+            Config::get('centralStorage.server'),
+            Config::get('centralStorage.key'),
+            Config::get('centralStorage.secret'),
+            null,
+            Config::get('centralStorage.version')
         );
 
-        if (!empty(\Config::get('centralStorage.front'))) {
-            $client->setFrontUrl(\Config::get('centralStorage.front'));
+        if (!empty(Config::get('centralStorage.front'))) {
+            $client->setFrontUrl(Config::get('centralStorage.front'));
         }
 
         return $client;

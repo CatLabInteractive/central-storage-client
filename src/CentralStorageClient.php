@@ -513,6 +513,18 @@ class CentralStorageClient implements CentralStorageClientInterface
         // Return a publicly accessible endpoint
         $url = $this->getFrontUrl() . '/proxy/' . $this->consumerKey . '/' . $base64Url . '/' . $signature;
 
-        return $url;
+        // Add properties
+        $query = '';
+
+        $version = $this->version;
+        if (!empty($version)) {
+            $properties['_v'] = $version;
+        }
+
+        if (!empty($properties)) {
+            $query = '?' . http_build_query($properties);
+        }
+
+        return $url . $query;
     }
 }

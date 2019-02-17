@@ -145,10 +145,22 @@ class CentralStorageClient implements CentralStorageClientInterface
         // Add a nonce that we won't check but we add it anyway.
         $request->query->set(self::QUERY_NONCE, $this->getNonce());
 
-        $signature = $this->getSignature($request, $this->algorithm, $secret);
+        $signature = $this->getSignature($request->query(), $this->algorithm, $secret);
 
         $request->headers->set(self::HEADER_SIGNATURE, $signature);
         $request->headers->set(self::HEADER_KEY, $key);
+    }
+
+    /**
+     * @param array $parameters
+     * @param string $secret
+     * @return string
+     */
+    public function signParameters(array $parameters, $secret = null)
+    {
+        $secret = $secret ?? $this->consumerSecret;
+
+        return $this->getSignature($parameters, $this->algorithm, $secret);
     }
 
     /**
@@ -165,21 +177,32 @@ class CentralStorageClient implements CentralStorageClientInterface
             return false;
         }
 
-        $signatureParts = explode(':', $fullSignature);
+        return $this->isValidParameters($request->query(), $fullSignature, $secret);
+    }
+
+    /**
+     * @param array $parameters
+     * @param $providedSignature
+     * @param $secret
+     * @return bool
+     */
+    public function isValidParameters(array $parameters, $providedSignature, $secret)
+    {
+        $signatureParts = explode(':', $providedSignature);
         if (count($signatureParts) != 3) {
             return false;
         }
 
         $algorithm = array_shift($signatureParts);
         $salt = array_shift($signatureParts);
-        $signature = array_shift($signatureParts);
+        //$signature = array_shift($signatureParts);
 
-        $actualSignature = $this->getSignature($request, $algorithm, $secret, $salt);
+        $actualSignature = $this->getSignature($parameters, $algorithm, $secret, $salt);
         if (!$actualSignature) {
             return false;
         }
 
-        return $fullSignature === $actualSignature;
+        return $providedSignature === $actualSignature;
     }
 
     /**
@@ -235,38 +258,37 @@ class CentralStorageClient implements CentralStorageClientInterface
     }
 
     /**
-     * @param Request $request
-     * @param $algorithm
-     * @param $secret
-     * @param null $salt
+     * Same as getSignature, but doesn't require a request.
+     * @param array $parameters
+     * @param string $algorithm
+     * @param string $secret
+     * @param string $salt
      * @return string
      */
-    protected function getSignature(Request $request, $algorithm, $secret, $salt = null)
+    protected function getSignature(array $parameters, $algorithm, $secret, $salt = null)
     {
         if (!$this->isValidAlgorithm($algorithm)) {
             return false;
         }
-
-        $inputs = $request->query();
 
         // Add some salt
         if (!isset($salt)) {
             $salt = str_random(16);
         }
 
-        $inputs['salt'] = $salt;
-        $inputs['secret'] = $secret;
+        $parameters['salt'] = $salt;
+        $parameters['secret'] = $secret;
 
         // Sort on key
-        ksort($inputs);
+        ksort($parameters);
 
         // Turn into a string
-        $base = http_build_query($inputs);
+        $base = http_build_query($parameters);
 
         // And... hash!
         $signature = hash($algorithm, $base);
 
-        return $algorithm . ':' . $inputs['salt'] . ':' . $signature;
+        return $algorithm . ':' . $parameters['salt'] . ':' . $signature;
     }
 
     /**
@@ -460,5 +482,37 @@ class CentralStorageClient implements CentralStorageClientInterface
         }
 
         return $body['success'];
+    }
+
+    /**
+     * Cache a public resource on our asset server and manipulate it.
+     * This will not create an Asset, but instead store a cached copy of
+     * the public asset on the asset server.
+     *
+     * In order to avoid misuse, an authentication parameter will be added.
+     * Some properties might not be available.
+     * @param $publicUrl
+     * @param array $properties
+     * @param string $server
+     * @return string
+     */
+    public function getPublicAssetUrl($publicUrl, array $properties = [])
+    {
+        $base64Url = base64_encode($publicUrl);
+
+        $parameters = [
+            'url' => $publicUrl
+        ];
+
+        // We need a fixed salt in order to not break caching.
+        $salt = mb_substr(md5($publicUrl), 0, 10);
+
+        // Sign the request
+        $signature = $this->getSignature($parameters, $this->algorithm, $this->consumerSecret, $salt);
+
+        // Return a publicly accessible endpoint
+        $url = $this->getFrontUrl() . '/proxy/' . $this->consumerKey . '/' . $base64Url . '/' . $signature;
+
+        return $url;
     }
 }

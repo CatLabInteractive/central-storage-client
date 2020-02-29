@@ -25,6 +25,11 @@ return [
     /**
      * Version (to break caching)
      */
-    'version' => null
+    'version' => null,
+
+    /**
+     * Asset model
+     */
+    'model' => \CatLab\CentralStorage\Client\Models\Asset::class
 
 ];

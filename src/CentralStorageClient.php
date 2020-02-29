@@ -223,7 +223,7 @@ class CentralStorageClient implements CentralStorageClientInterface
     ) {
         $url = $this->getUrl('upload', $server);
 
-        $request = Request::create(
+        $request = Request::create``(
             $url,
             'POST',
             [
@@ -394,7 +394,13 @@ class CentralStorageClient implements CentralStorageClientInterface
      */
     protected function createNewAsset($key)
     {
-        $asset = new Asset();
+        $modelClassName = Config::get('centralStorage.model');
+        if (!isset($modelClassName)) {
+            $modelClassName = Asset::class;
+        }
+
+        /** @var Asset $asset */
+        $asset = new $modelClassName;
         $asset->setAssetKey($key);
 
         return $asset;

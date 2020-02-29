@@ -223,7 +223,7 @@ class CentralStorageClient implements CentralStorageClientInterface
     ) {
         $url = $this->getUrl('upload', $server);
 
-        $request = Request::create``(
+        $request = Request::create(
             $url,
             'POST',
             [

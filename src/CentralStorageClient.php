@@ -2,6 +2,7 @@
 
 namespace CatLab\CentralStorage\Client;
 
+use CatLab\CentralStorage\Client\Exceptions\CentralStorageException;
 use CatLab\CentralStorage\Client\Exceptions\StorageServerException;
 use CatLab\CentralStorage\Client\Interfaces\CentralStorageClient as CentralStorageClientInterface;
 use CatLab\CentralStorage\Client\Models\Asset;
@@ -60,6 +61,11 @@ class CentralStorageClient implements CentralStorageClientInterface
     protected $version;
 
     /**
+     * @var string
+     */
+    protected $assetClassName = Asset::class;
+
+    /**
      * @return CentralStorageClient
      */
     public static function fromConfig()
@@ -72,8 +78,12 @@ class CentralStorageClient implements CentralStorageClientInterface
             Config::get('centralStorage.version')
         );
 
-        if (!empty(Config::get('centralStorage.front'))) {
+        if (Config::get('centralStorage.front')) {
             $client->setFrontUrl(Config::get('centralStorage.front'));
+        }
+
+        if (Config::get('centralStorage.model')) {
+            $client->setAssetClassName(Config::get('centralStorage.model'));
         }
 
         return $client;
@@ -104,6 +114,22 @@ class CentralStorageClient implements CentralStorageClientInterface
         $this->consumerSecret = $consumerSecret;
         $this->version = $version;
         $this->front = null;
+    }
+
+    /**
+     * @param $className
+     * @return $this
+     * @throws CentralStorageException
+     */
+    public function setAssetClassName($className)
+    {
+        // check if asset class name is valid
+        if (!is_subclass_of($className, Asset::class)) {
+            throw new CentralStorageException('AssetClassname must extend ' . Asset::class);
+        }
+
+        $this->assetClassName = $className;
+        return $this;
     }
 
     /**
@@ -394,10 +420,7 @@ class CentralStorageClient implements CentralStorageClientInterface
      */
     protected function createNewAsset($key)
     {
-        $modelClassName = Config::get('centralStorage.model');
-        if (!isset($modelClassName)) {
-            $modelClassName = Asset::class;
-        }
+        $modelClassName = $this->assetClassName;
 
         /** @var Asset $asset */
         $asset = new $modelClassName;

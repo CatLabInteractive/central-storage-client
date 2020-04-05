@@ -284,6 +284,39 @@ class CentralStorageClient implements CentralStorageClientInterface
     }
 
     /**
+     * Remove an asset (in case it is not in use anymore)
+     * @param Asset $asset
+     * @param null $server
+     * @param null $key
+     * @param null $secret
+     * @return bool
+     * @throws StorageServerException
+     */
+    public function delete(
+        Asset $asset,
+        $server = null,
+        $key = null,
+        $secret = null
+    ) {
+        $url = $this->getUrl('assets/' . $asset->getAssetKey(), $server);
+
+        $request = Request::create(
+            $url,
+            'DELETE'
+        );
+
+        $this->sign($request, $key, $secret);
+
+        try {
+            $result = $this->send($request);
+        } catch (RequestException $e) {
+            throw StorageServerException::make($e);
+        }
+
+        return true;
+    }
+
+    /**
      * Same as getSignature, but doesn't require a request.
      * @param array $parameters
      * @param string $algorithm

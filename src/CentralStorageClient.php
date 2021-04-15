@@ -12,6 +12,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -332,7 +333,7 @@ class CentralStorageClient implements CentralStorageClientInterface
 
         // Add some salt
         if (!isset($salt)) {
-            $salt = str_random(16);
+            $salt = Str::random(16);
         }
 
         $parameters['salt'] = $salt;

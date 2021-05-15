@@ -238,7 +238,7 @@ class CentralStorageClient implements CentralStorageClientInterface
      * @param null $server
      * @param null $key
      * @param null $secret
-     * @return Asset
+     * @return \CatLab\CentralStorage\Models
      * @throws StorageServerException
      */
     public function store(

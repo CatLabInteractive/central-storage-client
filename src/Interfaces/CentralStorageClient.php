@@ -4,7 +4,6 @@ namespace CatLab\CentralStorage\Client\Interfaces;
 
 use CatLab\CentralStorage\Client\Models\Asset;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -38,7 +37,7 @@ interface CentralStorageClient
      * @param null $server
      * @param null $key
      * @param null $secret
-     * @return mixed
+     * @return \CatLab\CentralStorage\Client\Models\Asset
      */
     public function store(
         File $file,

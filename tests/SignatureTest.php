@@ -4,12 +4,13 @@ namespace Tests;
 
 use CatLab\CentralStorage\Client\CentralStorageClient;
 use Illuminate\Http\Request;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class SignatureTest
  * @package Tests
  */
-class SignatureTest extends \PHPUnit_Framework_TestCase
+class SignatureTest extends TestCase
 {
     private $key = 'abcdef';
     private $secret = 'bcdefhijklmn';

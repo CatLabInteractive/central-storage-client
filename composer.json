@@ -24,6 +24,11 @@
   },
   "require-dev": {
     "phpunit/phpunit": "*",
-    "laravel/framework": "5.4.*"
+    "laravel/framework": "~9.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "kylekatarnls/update-helper": true
+    }
   }
 }
